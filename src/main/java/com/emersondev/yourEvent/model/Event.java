@@ -13,6 +13,10 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "event_id")
     private Integer eventId;
+    
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @Column(name = "title", length = 255, nullable = false)
     private String title;
@@ -40,6 +44,14 @@ public class Event {
 
     public LocalTime getStartTime() {
         return startTime;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public void setStartTime(LocalTime startTime) {

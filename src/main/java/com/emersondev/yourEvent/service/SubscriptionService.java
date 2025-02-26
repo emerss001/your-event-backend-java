@@ -1,5 +1,7 @@
 package com.emersondev.yourEvent.service;
 
+import com.emersondev.yourEvent.dto.SubscriptionRankingByUser;
+import com.emersondev.yourEvent.dto.SubscriptionRankingItem;
 import com.emersondev.yourEvent.dto.SubscriptionResponse;
 import com.emersondev.yourEvent.exception.EventNotFoundException;
 import com.emersondev.yourEvent.exception.SubscriptionConflictException;
@@ -12,6 +14,8 @@ import com.emersondev.yourEvent.repo.SubscriptionRepo;
 import com.emersondev.yourEvent.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class SubscriptionService {
@@ -32,9 +36,12 @@ public class SubscriptionService {
         }
         
         // verificar se o usuario indicador existe
-        User userIndicator = userRepo.findById(userIndicatorId).orElse(null);
-        if (userIndicator == null) {
-            throw new UserIndicatorNotFoundException("User indicator with id " + userIndicatorId + " not found");
+        User userIndicator = null;
+        if (userIndicatorId != null) {
+            userIndicator = userRepo.findById(userIndicatorId).orElse(null);
+            if (userIndicator == null) {
+                throw new UserIndicatorNotFoundException("User indicator with id " + userIndicatorId + " not found");
+            }
         }
         
         // verificar se o usuario já existe
@@ -58,4 +65,30 @@ public class SubscriptionService {
         Subscription response = subscriptionRepo.save((newSubscription));
         return new SubscriptionResponse(response.getSubscriptionNumber(), "http://yourevent.com/subscription/" + response.getEvent().getPrettyName() + "/" + response.getSubscriber().getId());
     }
+    
+    public List<SubscriptionRankingItem> getCompleteRanking(String prettyName) {
+        Event event = eventRepo.findByPrettyName(prettyName);
+        if (event == null) {
+            throw new EventNotFoundException("event " + prettyName + " not found");
+        }
+        
+        return subscriptionRepo.generateRanking(event.getEventId());
+    }
+    
+    public SubscriptionRankingByUser getRankingByUser(String prettyName, Integer userId) {
+        List<SubscriptionRankingItem> ranking = getCompleteRanking(prettyName);
+        
+        SubscriptionRankingItem positionOfRanking = ranking.stream()
+                .filter(item -> item.userId().equals(userId))
+                .findFirst()
+                .orElse(null);
+        
+        if (positionOfRanking == null) {
+            throw new UserIndicatorNotFoundException("Not indicator found for user with id " + userId);
+        }
+
+        Integer position = ranking.indexOf(positionOfRanking) + 1;
+        return new SubscriptionRankingByUser(positionOfRanking, position);
+    }
+    
 }   
