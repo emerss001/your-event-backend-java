@@ -1,5 +1,6 @@
 package com.emersondev.yourEvent.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ public class Event {
     @Column(name = "event_id")
     private Integer eventId;
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;

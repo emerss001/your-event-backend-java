@@ -1,5 +1,6 @@
 package com.emersondev.yourEvent.service;
 
+import com.emersondev.yourEvent.dto.NewEventRequest;
 import com.emersondev.yourEvent.exception.EventConflictException;
 import com.emersondev.yourEvent.exception.UserOwnerNotFound;
 import com.emersondev.yourEvent.model.Event;
@@ -21,23 +22,37 @@ public class EventService {
     @Autowired
     private UserRepo userRepo;
 
-    public Event addNewEvent(Event event, String name, String email) {
-        String preetyName = event.getTitle().toLowerCase().replaceAll(" ", "-");
-        if (eventRepo.findByPrettyName(preetyName) != null) {
-            throw new EventConflictException("Event with pretty name " + preetyName + " already exists");
+    public Event addNewEvent(NewEventRequest newEventRequest) {
+        String prettyName = newEventRequest.title().toLowerCase().replaceAll(" ", "-");
+        
+        // checando se o evento já existe
+        if (eventRepo.findByPrettyName(prettyName) != null) {
+            throw new EventConflictException("Event with pretty name " + prettyName + " already exists");
         }
         
-            // checando se o criador do evento existe
-            User owner = userRepo.findByEmail(email);
-            if (owner == null) {
-                owner.setEmail(email);
-                owner.setName(name);
-                owner = userRepo.save(owner);
-            }
-            
-            event.setPrettyName(preetyName);
-            event.setOwner(owner);
-            return eventRepo.save(event);
+        // checando se o criador do evento existe
+        
+        User owner = userRepo.findByEmail(newEventRequest.email());
+        if (owner == null) {
+            owner = new User();
+            owner.setEmail(newEventRequest.email());
+            owner.setName(newEventRequest.name());
+            owner = userRepo.save(owner);
+        }
+        
+        Event event = new Event();
+        
+        event.setOwner(owner);   
+        event.setPrettyName(prettyName);
+        event.setTitle(newEventRequest.title());
+        event.setLocation(newEventRequest.location());
+        event.setPrice(newEventRequest.price());
+        event.setStartDate(newEventRequest.startDate());
+        event.setEndDate(newEventRequest.endDate());
+        event.setStartTime(newEventRequest.startTime());
+        event.setEndTime(newEventRequest.endTime());
+        
+        return eventRepo.save(event);
     }
 
     public List<Event> getAllEvents() {
