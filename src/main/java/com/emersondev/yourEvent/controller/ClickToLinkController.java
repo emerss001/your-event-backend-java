@@ -22,24 +22,29 @@ public class ClickToLinkController {
     private ClickToLinkService clickToLinkService;
     
     @Operation(description = "Adicionar um click a um link")    
-    @PostMapping("/clicks/{event_id}/{owner_id}")
+    @PostMapping("/clicks/{prettyName}/{owner_id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Link clicado", content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "Evento ou dono do link não encontrado", content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
     })
-    public ResponseEntity<Object> addClickToLink(@PathVariable("event_id") Integer event_id, @PathVariable("owner_id") Integer owner_id) {
+    public ResponseEntity<Object> addClickToLink(@PathVariable("prettyName") String prettyName, @PathVariable("owner_id") Integer owner_id) {
         try {
-            clickToLinkService.addClickToLink(event_id, owner_id);
+            clickToLinkService.addClickToLink(prettyName, owner_id);
             return ResponseEntity.ok("Link clicked");
         } catch (IllegalArgumentException error) {
             return ResponseEntity.status(404).body(new ErrorMessage(error.getMessage()));
         }
     }
     
-    @GetMapping("/clicks/{event_id}/{owner_id}")
-    public ResponseEntity<Object> getClicksToLink(@PathVariable("event_id") Integer event_id, @PathVariable("owner_id") Integer owner_id) {
+    @Operation(description = "Buscar a quantidade de clicks de um link")
+    @GetMapping("/clicks/{prettyName}/{owner_id}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Quantidade de clicks", content = @Content(schema = @Schema(implementation = ClicksToLinkResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Evento ou dono do link não encontrado", content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+    })
+    public ResponseEntity<Object> getClicksToLink(@PathVariable("prettyName") String prettyName, @PathVariable("owner_id") Integer owner_id) {
         try {
-            ClicksToLinkResponse clicks = clickToLinkService.getClickToLink(event_id, owner_id);
+            ClicksToLinkResponse clicks = clickToLinkService.getClickToLink(prettyName, owner_id);
             return ResponseEntity.ok(clicks);
         } catch (IllegalArgumentException error) {
             return ResponseEntity.status(404).body(new ErrorMessage(error.getMessage()));

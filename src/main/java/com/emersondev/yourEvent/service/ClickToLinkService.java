@@ -21,12 +21,13 @@ public class ClickToLinkService {
     @Autowired
     private UserRepo userRepo;
 
-    public ClickToLink addClickToLink(Integer event_id, Integer owner_id) {
-        if (event_id == null || owner_id == null) {
+    public void addClickToLink(String prettyName, Integer owner_id) {
+        if (prettyName == null || owner_id == null) {
             throw new IllegalArgumentException("Link cannot be null");
         }
         
-        if (eventRepo.findById(event_id).orElse(null) == null) {
+        Event event = eventRepo.findByPrettyName(prettyName);
+        if (event == null) {
             throw new IllegalArgumentException("Event not found");
         }
         
@@ -35,20 +36,19 @@ public class ClickToLinkService {
         }
         
         ClickToLink link = new ClickToLink();
-        link.setEventId(eventRepo.findById(event_id).orElse(null));
+        link.setEventId(eventRepo.findById(event.getEventId()).orElse(null));
         link.setOwnerLink(userRepo.findById(owner_id).orElse(null));
          
         clickToLinkRepo.save(link);
-        
-        return link;
     }
     
-    public ClicksToLinkResponse getClickToLink(Integer event_id, Integer owner_id) {
-        if (event_id == null || owner_id == null) {
+    public ClicksToLinkResponse getClickToLink(String prettyName, Integer owner_id) {
+        if (prettyName == null || owner_id == null) {
             throw new IllegalArgumentException("Link cannot be null");
         }
-
-        if (eventRepo.findById(event_id).orElse(null) == null) {
+        
+        Event event = eventRepo.findByPrettyName(prettyName);
+        if (event == null) {
             throw new IllegalArgumentException("Event not found");
         }
 
@@ -56,7 +56,7 @@ public class ClickToLinkService {
             throw new IllegalArgumentException("Owner not found");
         }
         
-        return new ClicksToLinkResponse(clickToLinkRepo.findByQuantityClicks(event_id, owner_id));
+        return new ClicksToLinkResponse(clickToLinkRepo.findByQuantityClicks(event.getEventId(), owner_id));
     }
     
     
