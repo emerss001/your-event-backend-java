@@ -30,7 +30,7 @@ public class ClickToLinkController {
     public ResponseEntity<Object> addClickToLink(@PathVariable("prettyName") String prettyName, @PathVariable("owner_id") Integer owner_id) {
         try {
             clickToLinkService.addClickToLink(prettyName, owner_id);
-            return ResponseEntity.ok("Link clicked");
+            return ResponseEntity.ok().body("Link clicked");
         } catch (IllegalArgumentException error) {
             return ResponseEntity.status(404).body(new ErrorMessage(error.getMessage()));
         }

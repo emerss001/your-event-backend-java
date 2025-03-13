@@ -77,18 +77,13 @@ public class SubscriptionService {
     
     public SubscriptionRankingByUser getRankingByUser(String prettyName, Integer userId) {
         List<SubscriptionRankingItem> ranking = getCompleteRanking(prettyName);
-        
+
         SubscriptionRankingItem positionOfRanking = ranking.stream()
                 .filter(item -> item.userId().equals(userId))
                 .findFirst()
                 .orElse(null);
-        
-        if (positionOfRanking == null) {
-            throw new UserIndicatorNotFoundException("Not indicator found for user with id " + userId);
-        }
 
         Integer position = ranking.indexOf(positionOfRanking) + 1;
         return new SubscriptionRankingByUser(positionOfRanking, position);
     }
-    
 }   
