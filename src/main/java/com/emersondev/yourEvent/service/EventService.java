@@ -44,6 +44,7 @@ public class EventService {
         
         event.setOwner(owner);   
         event.setPrettyName(prettyName);
+        event.setDescription(newEventRequest.description());
         event.setTitle(newEventRequest.title());
         event.setLocation(newEventRequest.location());
         event.setPrice(newEventRequest.price());

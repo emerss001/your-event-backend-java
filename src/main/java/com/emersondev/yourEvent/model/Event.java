@@ -22,6 +22,9 @@ public class Event {
 
     @Column(name = "title", length = 255, nullable = false)
     private String title;
+    
+    @Column(name = "event_description", length = 300, nullable = false)
+    private String description;
 
     @Column(name = "pretty_name", length = 50, nullable = false, unique = true)
     private String prettyName;
@@ -66,6 +69,14 @@ public class Event {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDate getStartDate() {
