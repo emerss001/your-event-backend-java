@@ -31,7 +31,6 @@ public class EventService {
         }
         
         // checando se o criador do evento existe
-        
         User owner = userRepo.findByEmail(newEventRequest.email());
         if (owner == null) {
             owner = new User();
@@ -39,10 +38,16 @@ public class EventService {
             owner.setName(newEventRequest.name());
             owner = userRepo.save(owner);
         }
-        
+
+        Event event = newEvent(newEventRequest, owner, prettyName);
+
+        return eventRepo.save(event);
+    }
+
+    private Event newEvent(NewEventRequest newEventRequest, User owner, String prettyName) {
         Event event = new Event();
-        
-        event.setOwner(owner);   
+
+        event.setOwner(owner);
         event.setPrettyName(prettyName);
         event.setDescription(newEventRequest.description());
         event.setTitle(newEventRequest.title());
@@ -52,8 +57,7 @@ public class EventService {
         event.setEndDate(newEventRequest.endDate());
         event.setStartTime(newEventRequest.startTime());
         event.setEndTime(newEventRequest.endTime());
-        
-        return eventRepo.save(event);
+        return event;
     }
 
     public List<Event> getAllEvents() {
